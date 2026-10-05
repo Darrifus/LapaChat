@@ -1,0 +1,174 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" type="device" version="24.0.0">
+  <diagram id="er" name="ER">
+    <mxGraphModel dx="1700" dy="1610" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1700" pageHeight="1610">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="entity_verification_challenges" value="" style="rounded=1;fillColor=#FFFFFF;strokeColor=#47637D;" vertex="1" parent="1">
+          <mxGeometry x="35" y="85" width="485" height="445" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_verification_challenges_title" value="verification_challenges" style="rounded=0;fillColor=#183653;strokeColor=#183653;fontColor=#FFFFFF;fontSize=30;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="35" y="85" width="485" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_verification_challenges_fields" value="id  PK&#10;phone&#10;code_hash&#10;provider, status&#10;attempts&#10;created_at, expires_at&#10;used_at" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=33;fontFamily=Arial;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="47" y="153" width="461" height="370" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_users" value="" style="rounded=1;fillColor=#FFFFFF;strokeColor=#47637D;" vertex="1" parent="1">
+          <mxGeometry x="630" y="105" width="435" height="300" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_users_title" value="users" style="rounded=0;fillColor=#183653;strokeColor=#183653;fontColor=#FFFFFF;fontSize=30;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="630" y="105" width="435" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_users_fields" value="id  PK&#10;phone  UNIQUE&#10;display_name&#10;city&#10;created_at" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=33;fontFamily=Arial;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="642" y="173" width="411" height="225" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_sessions" value="" style="rounded=1;fillColor=#FFFFFF;strokeColor=#47637D;" vertex="1" parent="1">
+          <mxGeometry x="1225" y="120" width="430" height="255" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_sessions_title" value="sessions" style="rounded=0;fillColor=#183653;strokeColor=#183653;fontColor=#FFFFFF;fontSize=30;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="1225" y="120" width="430" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_sessions_fields" value="id  PK&#10;user_id  FK&#10;refresh_token_hash UQ&#10;expires_at, revoked_at" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=33;fontFamily=Arial;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="1237" y="188" width="406" height="180" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_pets" value="" style="rounded=1;fillColor=#FFFFFF;strokeColor=#47637D;" vertex="1" parent="1">
+          <mxGeometry x="45" y="670" width="475" height="325" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_pets_title" value="pets" style="rounded=0;fillColor=#183653;strokeColor=#183653;fontColor=#FFFFFF;fontSize=30;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="45" y="670" width="475" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_pets_fields" value="id  PK&#10;owner_id  FK&#10;name, species&#10;birth_year&#10;created_at" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=33;fontFamily=Arial;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="57" y="738" width="451" height="250" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_chats" value="" style="rounded=1;fillColor=#FFFFFF;strokeColor=#47637D;" vertex="1" parent="1">
+          <mxGeometry x="630" y="615" width="445" height="360" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_chats_title" value="chats" style="rounded=0;fillColor=#183653;strokeColor=#183653;fontColor=#FFFFFF;fontSize=30;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="630" y="615" width="445" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_chats_fields" value="id  PK&#10;type, title&#10;created_by  FK&#10;direct_pair_key UQ&#10;next_message_seq&#10;created_at" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=33;fontFamily=Arial;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="642" y="683" width="421" height="285" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_chat_members" value="" style="rounded=1;fillColor=#FFFFFF;strokeColor=#47637D;" vertex="1" parent="1">
+          <mxGeometry x="1225" y="645" width="430" height="265" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_chat_members_title" value="chat_members" style="rounded=0;fillColor=#183653;strokeColor=#183653;fontColor=#FFFFFF;fontSize=30;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="1225" y="645" width="430" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_chat_members_fields" value="chat_id  PK, FK&#10;user_id  PK, FK&#10;role&#10;joined_at" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=33;fontFamily=Arial;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="1237" y="713" width="406" height="190" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_messages" value="" style="rounded=1;fillColor=#FFFFFF;strokeColor=#47637D;" vertex="1" parent="1">
+          <mxGeometry x="50" y="1150" width="560" height="380" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_messages_title" value="messages" style="rounded=0;fillColor=#183653;strokeColor=#183653;fontColor=#FFFFFF;fontSize=30;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="50" y="1150" width="560" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_messages_fields" value="id  PK&#10;chat_id  FK&#10;sender_id  FK&#10;client_message_id&#10;seq&#10;body, created_at" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=33;fontFamily=Arial;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="62" y="1218" width="536" height="305" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_read_receipts" value="" style="rounded=1;fillColor=#FFFFFF;strokeColor=#47637D;" vertex="1" parent="1">
+          <mxGeometry x="1125" y="1170" width="535" height="290" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_read_receipts_title" value="read_receipts" style="rounded=0;fillColor=#183653;strokeColor=#183653;fontColor=#FFFFFF;fontSize=30;fontStyle=1;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="1125" y="1170" width="535" height="58" as="geometry" />
+        </mxCell>
+        <mxCell id="entity_read_receipts_fields" value="chat_id  PK, FK&#10;user_id  PK, FK&#10;last_read_seq  FK&#10;read_at" style="text;html=0;whiteSpace=wrap;align=left;verticalAlign=top;fontSize=33;fontFamily=Arial;spacingLeft=6;" vertex="1" parent="1">
+          <mxGeometry x="1137" y="1238" width="511" height="215" as="geometry" />
+        </mxCell>
+        <mxCell id="edge0" value="" edge="1" parent="1" source="entity_users" target="entity_sessions" style="edgeStyle=none;rounded=0;html=0;endArrow=block;endFill=1;strokeColor=#536779;strokeWidth=2;fontSize=27;fontFamily=Arial;labelBackgroundColor=#FFFFFF;exitX=1.0;exitY=0.43333333333333335;entryX=0.0;entryY=0.45098039215686275;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_label0" value="1 : 0..N" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontSize=27;fontColor=#37495A;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="1089.00390625" y="175.5" width="111.9921875" height="39" as="geometry" />
+        </mxCell>
+        <mxCell id="edge1" value="" edge="1" parent="1" source="entity_users" target="entity_pets" style="edgeStyle=none;rounded=0;html=0;endArrow=block;endFill=1;strokeColor=#536779;strokeWidth=2;fontSize=27;fontFamily=Arial;labelBackgroundColor=#FFFFFF;exitX=0.0;exitY=0.7166666666666667;entryX=1.0;entryY=0.4153846153846154;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="565" y="320" />
+              <mxPoint x="565" y="805" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_label1" value="1 : 0..5" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontSize=27;fontColor=#37495A;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="500.51171875" y="570.5" width="108.9765625" height="39" as="geometry" />
+        </mxCell>
+        <mxCell id="edge2" value="" edge="1" parent="1" source="entity_users" target="entity_chats" style="edgeStyle=none;rounded=0;html=0;endArrow=block;endFill=1;strokeColor=#536779;strokeWidth=2;fontSize=27;fontFamily=Arial;labelBackgroundColor=#FFFFFF;exitX=0.5057471264367817;exitY=1.0;entryX=0.4943820224719101;entryY=0.0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_label2" value="1 : 0..N" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontSize=27;fontColor=#37495A;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="894.00390625" y="490.5" width="111.9921875" height="39" as="geometry" />
+        </mxCell>
+        <mxCell id="edge3" value="" edge="1" parent="1" source="entity_users" target="entity_chat_members" style="edgeStyle=none;rounded=0;html=0;endArrow=block;endFill=1;strokeColor=#536779;strokeWidth=2;fontSize=27;fontFamily=Arial;labelBackgroundColor=#FFFFFF;exitX=1.0;exitY=0.8;entryX=0.5116279069767442;entryY=0.0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1155" y="345" />
+              <mxPoint x="1155" y="550" />
+              <mxPoint x="1445" y="550" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_label3" value="1 : 0..N" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontSize=27;fontColor=#37495A;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="1274.00390625" y="498.5" width="111.9921875" height="39" as="geometry" />
+        </mxCell>
+        <mxCell id="edge4" value="" edge="1" parent="1" source="entity_chats" target="entity_chat_members" style="edgeStyle=none;rounded=0;html=0;endArrow=block;endFill=1;strokeColor=#536779;strokeWidth=2;fontSize=27;fontFamily=Arial;labelBackgroundColor=#FFFFFF;exitX=1.0;exitY=0.4722222222222222;entryX=0.0;entryY=0.5283018867924528;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_label4" value="1 : 2..100" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontSize=27;fontColor=#37495A;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="1078.33203125" y="717.5" width="143.3359375" height="39" as="geometry" />
+        </mxCell>
+        <mxCell id="edge5" value="" edge="1" parent="1" source="entity_chats" target="entity_messages" style="edgeStyle=none;rounded=0;html=0;endArrow=block;endFill=1;strokeColor=#536779;strokeWidth=2;fontSize=27;fontFamily=Arial;labelBackgroundColor=#FFFFFF;exitX=0.0;exitY=0.7222222222222222;entryX=0.6785714285714286;entryY=0.0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="585" y="875" />
+              <mxPoint x="585" y="1085" />
+              <mxPoint x="430" y="1085" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_label5" value="1 : 0..N" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontSize=27;fontColor=#37495A;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="412.00390625" y="1060.5" width="111.9921875" height="39" as="geometry" />
+        </mxCell>
+        <mxCell id="edge6" value="" edge="1" parent="1" source="entity_chat_members" target="entity_messages" style="edgeStyle=none;rounded=0;html=0;endArrow=block;endFill=1;strokeColor=#536779;strokeWidth=2;fontSize=27;fontFamily=Arial;labelBackgroundColor=#FFFFFF;exitX=0.32558139534883723;exitY=1.0;entryX=1.0;entryY=0.39473684210526316;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1365" y="1030" />
+              <mxPoint x="720" y="1030" />
+              <mxPoint x="720" y="1300" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_label6" value="1 : 0..N" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontSize=27;fontColor=#37495A;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="864.00390625" y="1010.5" width="111.9921875" height="39" as="geometry" />
+        </mxCell>
+        <mxCell id="edge7" value="" edge="1" parent="1" source="entity_chat_members" target="entity_read_receipts" style="edgeStyle=none;rounded=0;html=0;endArrow=block;endFill=1;strokeColor=#536779;strokeWidth=2;fontSize=27;fontFamily=Arial;labelBackgroundColor=#FFFFFF;exitX=0.7441860465116279;exitY=1.0;entryX=0.7850467289719626;entryY=0.0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_label7" value="1 : 0..1" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontSize=27;fontColor=#37495A;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="1395.51171875" y="1080.5" width="108.9765625" height="39" as="geometry" />
+        </mxCell>
+        <mxCell id="edge8" value="" edge="1" parent="1" source="entity_messages" target="entity_read_receipts" style="edgeStyle=none;rounded=0;html=0;endArrow=block;endFill=1;strokeColor=#536779;strokeWidth=2;fontSize=27;fontFamily=Arial;labelBackgroundColor=#FFFFFF;exitX=0.5;exitY=1.0;entryX=0.4953271028037383;entryY=1.0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="330" y="1570" />
+              <mxPoint x="1390" y="1570" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_label8" value="1 : 0..N" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontSize=27;fontColor=#37495A;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="784.00390625" y="1550.5" width="111.9921875" height="39" as="geometry" />
+        </mxCell>
+        <mxCell id="text0" value="PK — первичный ключ&#10;FK — внешний ключ&#10;UQ — уникальность" style="text;whiteSpace=wrap;html=0;align=left;verticalAlign=top;fontSize=28;fontColor=#364759;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="755" y="1210" width="925" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="text1" value="Связь по телефону.&#10;Владелец может ещё&#10;не быть зарегистрирован." style="text;whiteSpace=wrap;html=0;align=left;verticalAlign=top;fontSize=26;fontColor=#364759;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="45" y="550" width="1635" height="100" as="geometry" />
+        </mxCell>
+        <mxCell id="text2" value="Поля и составные связи&#10;полностью описаны&#10;в schema.sql." style="text;whiteSpace=wrap;html=0;align=left;verticalAlign=top;fontSize=26;fontColor=#364759;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="720" y="1380" width="960" height="100" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

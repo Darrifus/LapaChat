@@ -1,0 +1,876 @@
+openapi: 3.0.3
+info:
+  title: ЛапаЧат API
+  version: 1.0.0
+  description: Архитектурный паспорт мессенджера для владельцев животных. Проектный контракт; работающего сервера
+    в репозитории нет. Публичные пути ниже дополняются префиксом /api/v1. Числа нагрузки и времени ответа являются
+    целями, а не измеренными результатами.
+servers:
+- url: http://localhost:8000/api/v1
+  description: Предлагаемая локальная среда разработки; сервер пока не реализован
+tags:
+- name: Авторизация
+- name: Пользователи
+- name: Питомцы
+- name: Чаты
+- name: Сообщения
+security:
+- bearerAuth: []
+paths:
+  /auth/challenges:
+    post:
+      tags:
+      - Авторизация
+      operationId: createChallenge
+      summary: Запросить код входа
+      security: []
+      description: Один запрос на номер не чаще раза в 60 секунд. Код действует 5 минут. Основной провайдер
+        получает 5 секунд на ответ; при ошибке или тайм-ауте используется резервный. Общая попытка завершается
+        не позднее 15 секунд. 201 означает, что провайдер принял SMS к отправке, а не гарантирует доставку.
+        Новый challenge отменяет предыдущий для номера. Если SMS принято, но не пришло, повторный запрос через
+        60 секунд переключает маршрут. Идентификатор challenge позволяет связывать попытки; код не возвращается
+        в API.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChallengeRequest'
+      responses:
+        '201':
+          description: Код принят к отправке
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Challenge'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /auth/verify:
+    post:
+      tags:
+      - Авторизация
+      operationId: verifyChallenge
+      summary: Подтвердить код и войти
+      security: []
+      description: Не более 5 попыток на challenge. Проверка, пометка used_at, создание пользователя при первом
+        входе и сессии выполняются атомарно. Повторное использование кода запрещено. При первом входе нужны
+        displayName и city. API возвращает access token на 15 минут и устанавливает refresh cookie на 30 дней.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyRequest'
+      responses:
+        '200':
+          description: Вход выполнен
+          headers:
+            Set-Cookie:
+              description: Обновлённый refresh_token; HttpOnly; Secure; SameSite=Strict; Path=/api/v1/auth;
+                Max-Age=2592000. Применяется в HTTPS-среде.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResult'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /auth/refresh:
+    post:
+      tags:
+      - Авторизация
+      operationId: refreshSession
+      summary: Обновить токен доступа
+      security:
+      - refreshCookie: []
+      description: Проверяется refresh cookie и Origin того же сайта. Refresh token заменяется атомарно; в
+        sessions хранится только его хеш. Клиент выполняет обновление последовательно. Истёкшая или отозванная
+        сессия требует повторного входа. Повтор старого refresh token отклоняется. Выход в MVP локальный, отзыв
+        сессии администратором выполняется вне публичного API.
+      responses:
+        '200':
+          description: Токен обновлён
+          headers:
+            Set-Cookie:
+              description: Обновлённый refresh_token; HttpOnly; Secure; SameSite=Strict; Path=/api/v1/auth;
+                Max-Age=2592000. Применяется в HTTPS-среде.
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AuthResult'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /users:
+    get:
+      tags:
+      - Пользователи
+      operationId: searchUsers
+      summary: Найти владельцев животных
+      description: Должен быть задан query или city. query — начало имени без учёта регистра, city — точное
+        название без учёта регистра, species — вид хотя бы одного питомца. Условия объединяются через И. Возвращаются
+        только владельцы с хотя бы одним питомцем; пользователь выводится один раз. Телефоны и токены других
+        пользователей не выдаются. Без query и city — 400.
+      parameters:
+      - name: query
+        in: query
+        description: Начало имени
+        schema:
+          type: string
+          minLength: 3
+          maxLength: 60
+      - name: city
+        in: query
+        description: Город владельца
+        schema:
+          type: string
+          minLength: 1
+          maxLength: 80
+      - name: species
+        in: query
+        description: Вид питомца
+        schema:
+          type: string
+          enum:
+          - dog
+          - cat
+          - bird
+          - rodent
+          - other
+      responses:
+        '200':
+          description: До 50 найденных пользователей
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+  /pets:
+    post:
+      tags:
+      - Питомцы
+      operationId: createPet
+      summary: Добавить карточку своего питомца
+      description: Владелец определяется по токену. Имя и вид обязательны, год рождения необязателен. Максимум
+        5 питомцев проверяется в транзакции под блокировкой строки владельца; при превышении — 400 PET_LIMIT.
+        Карточки читаются в составе User в GET /users и MyUser при входе или обновлении токена. Редактирование
+        и удаление карточек запланированы после MVP.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PetCreate'
+      responses:
+        '201':
+          description: Карточка питомца создана
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Pet'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+  /chats:
+    get:
+      tags:
+      - Чаты
+      operationId: listChats
+      summary: Получить свои чаты
+      description: 'Возвращаются только чаты текущего пользователя. Порядок: created_at, id по убыванию. Состав
+        участников в MVP задаётся при создании чата.'
+      parameters:
+      - name: cursor
+        in: query
+        description: Курсор из предыдущей страницы
+        schema:
+          type: string
+      - name: limit
+        in: query
+        description: Размер страницы
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 50
+      responses:
+        '200':
+          description: Страница чатов
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ChatPage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+    post:
+      tags:
+      - Чаты
+      operationId: createChat
+      summary: Создать личный или групповой чат
+      description: 'Чат и состав участников создаются одной транзакцией. Для direct используется уникальный
+        ключ отсортированной пары user_id: повтор возвращает существующий чат. Создатель не передаётся в memberIds,
+        его ID берётся из токена. В групповом чате 3–100 участников, включая создателя. Изменение участников
+        не входит в MVP.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ChatCreate'
+      responses:
+        '201':
+          description: Создан новый чат
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+        '200':
+          description: Личный чат уже существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Chat'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+  /chats/{chatId}/messages:
+    parameters:
+    - name: chatId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    get:
+      tags:
+      - Сообщения
+      operationId: listMessages
+      summary: Прочитать новые сообщения
+      description: Сервер проверяет членство в чате. Курсор afterSeq означает «строго после этого номера».
+        При hasMore=true следующая страница запрашивается сразу. В активном чате клиент опрашивает сервер каждые
+        3 секунды; фоновый опрос приостанавливается.
+      parameters:
+      - name: afterSeq
+        in: query
+        description: Последний полученный номер в этом чате
+        schema:
+          type: integer
+          format: int64
+          minimum: 0
+          default: 0
+      - name: limit
+        in: query
+        description: Размер страницы
+        schema:
+          type: integer
+          minimum: 1
+          maximum: 100
+          default: 50
+      responses:
+        '200':
+          description: Страница сообщений
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessagePage'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+    post:
+      tags:
+      - Сообщения
+      operationId: sendMessage
+      summary: Сохранить сообщение
+      description: Сервер проверяет членство; senderId берётся только из токена. Уникальность (sender_id, client_message_id)
+        предотвращает дубликаты. Повтор с тем же чатом и текстом возвращает 200 и исходный Message; иное содержимое
+        возвращает 409. Новый seq выдаётся под блокировкой строки chats, увеличение счётчика и INSERT сообщения
+        входят в одну транзакцию. Ответ означает сохранение сервером, но не прочтение получателем.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MessageCreate'
+      responses:
+        '201':
+          description: Сообщение сохранено
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '200':
+          description: Повтор ранее сохранённого сообщения
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Message'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          $ref: '#/components/responses/Conflict'
+        '429':
+          $ref: '#/components/responses/RateLimited'
+        '503':
+          $ref: '#/components/responses/Unavailable'
+  /chats/{chatId}/read:
+    parameters:
+    - name: chatId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    put:
+      tags:
+      - Сообщения
+      operationId: markRead
+      summary: Отметить сообщения прочитанными
+      description: 'lastReadSeq должен существовать в том же чате. Сервер проверяет членство. Сохраняется максимум
+        старого и нового значения: повтор запроса и более старый номер не уменьшают отметку. При отсутствии
+        изменения сохраняется прежний readAt. Состояния чтения всех участников возвращаются в GET /chats.'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ReadRequest'
+      responses:
+        '200':
+          description: Текущая отметка прочтения
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReadReceipt'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: 'Authorization: Bearer <accessToken>. Доступ разрешён только к своим чатам.'
+    refreshCookie:
+      type: apiKey
+      in: cookie
+      name: refresh_token
+      description: HttpOnly cookie, устанавливается после входа; Secure в HTTPS-среде; SameSite=Strict.
+  schemas:
+    Pet:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - ownerId
+      - name
+      - species
+      - birthYear
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        ownerId:
+          type: string
+          format: uuid
+        name:
+          type: string
+          minLength: 1
+          maxLength: 60
+        species:
+          type: string
+          enum:
+          - dog
+          - cat
+          - bird
+          - rodent
+          - other
+        birthYear:
+          type: integer
+          minimum: 1980
+          maximum: 2026
+          nullable: true
+        createdAt:
+          type: string
+          format: date-time
+    PetCreate:
+      type: object
+      additionalProperties: false
+      required:
+      - name
+      - species
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 60
+        species:
+          type: string
+          enum:
+          - dog
+          - cat
+          - bird
+          - rodent
+          - other
+        birthYear:
+          type: integer
+          minimum: 1980
+          maximum: 2026
+          nullable: true
+      description: ownerId определяется по токену. Не более пяти карточек на пользователя. Год рождения необязателен;
+        верхняя граница соответствует дате учебного контракта.
+    User:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - displayName
+      - city
+      - pets
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 60
+        city:
+          type: string
+          minLength: 1
+          maxLength: 80
+        pets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Pet'
+          maxItems: 5
+        createdAt:
+          type: string
+          format: date-time
+    MyUser:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - displayName
+      - city
+      - pets
+      - createdAt
+      - phone
+      properties:
+        id:
+          type: string
+          format: uuid
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 60
+        city:
+          type: string
+          minLength: 1
+          maxLength: 80
+        pets:
+          type: array
+          items:
+            $ref: '#/components/schemas/Pet'
+          maxItems: 5
+        createdAt:
+          type: string
+          format: date-time
+        phone:
+          type: string
+          pattern: ^\+[1-9][0-9]{9,14}$
+    ChallengeRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - phone
+      properties:
+        phone:
+          type: string
+          pattern: ^\+[1-9][0-9]{9,14}$
+          example: '+79990000000'
+    Challenge:
+      type: object
+      additionalProperties: false
+      required:
+      - challengeId
+      - expiresIn
+      - retryAfter
+      properties:
+        challengeId:
+          type: string
+          format: uuid
+        expiresIn:
+          type: integer
+          enum:
+          - 300
+        retryAfter:
+          type: integer
+          enum:
+          - 60
+    VerifyRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - challengeId
+      - code
+      properties:
+        challengeId:
+          type: string
+          format: uuid
+        code:
+          type: string
+          pattern: ^[0-9]{6}$
+          example: '000000'
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 60
+        city:
+          type: string
+          minLength: 1
+          maxLength: 80
+      description: При первом входе displayName и city обязательны; без них сервер возвращает 400 PROFILE_REQUIRED,
+        не погашая код. Для существующего пользователя эти поля не меняют профиль.
+    AuthResult:
+      type: object
+      additionalProperties: false
+      required:
+      - accessToken
+      - tokenType
+      - expiresIn
+      - user
+      properties:
+        accessToken:
+          type: string
+          description: Короткоживущий JWT. Не записывается в журналы.
+        tokenType:
+          type: string
+          enum:
+          - Bearer
+        expiresIn:
+          type: integer
+          enum:
+          - 900
+        user:
+          $ref: '#/components/schemas/MyUser'
+    ChatCreate:
+      type: object
+      additionalProperties: false
+      required:
+      - type
+      - memberIds
+      properties:
+        type:
+          type: string
+          enum:
+          - direct
+          - group
+        memberIds:
+          type: array
+          items:
+            type: string
+            format: uuid
+          minItems: 1
+          maxItems: 99
+          uniqueItems: true
+        title:
+          type: string
+          minLength: 1
+          maxLength: 100
+      description: 'Создатель добавляется автоматически. direct: ровно один другой пользователь, title не передаётся.
+        group: 2–99 других пользователей и обязательный title. Эти условия проверяет сервер; нарушение возвращает
+        400.'
+    ReadState:
+      type: object
+      additionalProperties: false
+      required:
+      - userId
+      - lastReadSeq
+      properties:
+        userId:
+          type: string
+          format: uuid
+        lastReadSeq:
+          type: integer
+          format: int64
+          minimum: 0
+    Message:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - chatId
+      - senderId
+      - clientMessageId
+      - seq
+      - body
+      - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        chatId:
+          type: string
+          format: uuid
+        senderId:
+          type: string
+          format: uuid
+        clientMessageId:
+          type: string
+          format: uuid
+        seq:
+          type: integer
+          format: int64
+          minimum: 1
+        body:
+          type: string
+          minLength: 1
+          maxLength: 4000
+        createdAt:
+          type: string
+          format: date-time
+    MessageCreate:
+      type: object
+      additionalProperties: false
+      required:
+      - clientMessageId
+      - body
+      properties:
+        clientMessageId:
+          type: string
+          format: uuid
+        body:
+          type: string
+          minLength: 1
+          maxLength: 4000
+      description: Клиент сохраняет этот объект в локальную очередь до отправки. При повторе использует тот
+        же clientMessageId.
+    Chat:
+      type: object
+      additionalProperties: false
+      required:
+      - id
+      - type
+      - title
+      - createdBy
+      - createdAt
+      - members
+      - readStates
+      properties:
+        id:
+          type: string
+          format: uuid
+        type:
+          type: string
+          enum:
+          - direct
+          - group
+        title:
+          type: string
+          nullable: true
+          maxLength: 100
+        createdBy:
+          type: string
+          format: uuid
+        createdAt:
+          type: string
+          format: date-time
+        members:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+          minItems: 2
+          maxItems: 100
+        readStates:
+          type: array
+          items:
+            $ref: '#/components/schemas/ReadState'
+          minItems: 2
+          maxItems: 100
+    ChatPage:
+      type: object
+      additionalProperties: false
+      required:
+      - items
+      - nextCursor
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Chat'
+        nextCursor:
+          type: string
+          nullable: true
+          description: Непрозрачный курсор по паре created_at и id. null означает конец списка.
+    MessagePage:
+      type: object
+      additionalProperties: false
+      required:
+      - items
+      - nextAfterSeq
+      - hasMore
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Message'
+        nextAfterSeq:
+          type: integer
+          format: int64
+          minimum: 0
+        hasMore:
+          type: boolean
+      description: Сообщения упорядочены по seq по возрастанию. nextAfterSeq равен seq последнего элемента,
+        а при пустой странице равен входному afterSeq.
+    UserPage:
+      type: object
+      additionalProperties: false
+      required:
+      - items
+      properties:
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+          maxItems: 50
+      description: Поиск возвращает не более 50 совпадений. Для уточнения результата нужно дополнить query.
+    ReadRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - lastReadSeq
+      properties:
+        lastReadSeq:
+          type: integer
+          format: int64
+          minimum: 1
+    ReadReceipt:
+      type: object
+      additionalProperties: false
+      required:
+      - chatId
+      - userId
+      - lastReadSeq
+      - readAt
+      properties:
+        chatId:
+          type: string
+          format: uuid
+        userId:
+          type: string
+          format: uuid
+        lastReadSeq:
+          type: integer
+          format: int64
+          minimum: 1
+        readAt:
+          type: string
+          format: date-time
+    Error:
+      type: object
+      additionalProperties: false
+      required:
+      - code
+      - message
+      - requestId
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+        requestId:
+          type: string
+          format: uuid
+      description: Технические детали, телефон, код и токены в ответ не включаются.
+  responses:
+    BadRequest:
+      description: Некорректные поля или нарушение правил чата
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unauthorized:
+      description: Неверный или истёкший токен / код; сессия отозвана
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Forbidden:
+      description: Нет права на действие
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    NotFound:
+      description: Объект не найден или недоступен пользователю
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Conflict:
+      description: Идентификатор повторного запроса использован с другим содержимым
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    Unavailable:
+      description: Временный сбой сервера либо обоих SMS-провайдеров
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+    RateLimited:
+      description: Превышен лимит запросов или попыток ввода кода
+      headers:
+        Retry-After:
+          description: Через сколько секунд можно повторить запрос
+          schema:
+            type: integer
+            minimum: 1
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
