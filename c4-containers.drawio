@@ -1,0 +1,81 @@
+<?xml version='1.0' encoding='utf-8'?>
+<mxfile host="app.diagrams.net" type="device">
+  <diagram id="container" name="Container">
+    <mxGraphModel dx="1600" dy="1040" grid="1" gridSize="10" page="1" pageScale="1" pageWidth="1600" pageHeight="1040">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="boundary0" value="ЛапаЧат [система]" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#FAFBFD;strokeColor=#9FAFC0;verticalAlign=top;align=left;spacing=20;fontSize=28;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="35" y="180" width="1120" height="825" as="geometry" />
+        </mxCell>
+        <mxCell id="person" value="Владелец животного&#10;[человек]" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#164D78;strokeColor=#47637D;fontColor=white;fontSize=30;fontFamily=Arial;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="400" y="10" width="400" height="135" as="geometry" />
+        </mxCell>
+        <mxCell id="web" value="Веб-клиент&#10;[контейнер: React / TS]&#10;Интерфейс и очередь&#10;в IndexedDB браузера" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#DAE8FC;strokeColor=#47637D;fontColor=#14283F;fontSize=30;fontFamily=Arial;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="155" y="280" width="415" height="220" as="geometry" />
+        </mxCell>
+        <mxCell id="api" value="Сервер API&#10;[контейнер: Python /&#10;FastAPI]&#10;Модуль учётных&#10;записей&#10;Модуль переписки&#10;Адаптеры SMS" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#DAE8FC;strokeColor=#47637D;fontColor=#14283F;fontSize=30;fontFamily=Arial;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="155" y="670" width="415" height="280" as="geometry" />
+        </mxCell>
+        <mxCell id="db" value="База данных&#10;[контейнер:&#10;PostgreSQL]&#10;Владельцы,&#10;питомцы,&#10;чаты и сообщения" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#DDEDE4;strokeColor=#47637D;fontColor=#14283F;fontSize=30;fontFamily=Arial;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="725" y="700" width="350" height="235" as="geometry" />
+        </mxCell>
+        <mxCell id="sms1" value="Основной SMS&#10;[внешняя система]&#10;Принимает запрос&#10;на отправку кода" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#ECEFF3;strokeColor=#47637D;fontColor=#14283F;fontSize=30;fontFamily=Arial;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="1200" y="320" width="360" height="215" as="geometry" />
+        </mxCell>
+        <mxCell id="sms2" value="Резервный SMS&#10;[внешняя система]&#10;Запасной маршрут" style="rounded=1;whiteSpace=wrap;html=0;fillColor=#ECEFF3;strokeColor=#47637D;fontColor=#14283F;fontSize=30;fontFamily=Arial;spacing=12;" vertex="1" parent="1">
+          <mxGeometry x="1200" y="730" width="360" height="215" as="geometry" />
+        </mxCell>
+        <mxCell id="edge0" value="" edge="1" parent="1" source="person" target="web" style="edgeStyle=none;rounded=0;html=0;endArrow=block;endFill=1;strokeColor=#536779;strokeWidth=2;fontSize=27;fontFamily=Arial;labelBackgroundColor=#FFFFFF;exitX=0.25;exitY=1.0;entryX=0.4939759036144578;entryY=0.0;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="500" y="255" />
+              <mxPoint x="360" y="255" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_label0" value="Использует" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontSize=27;fontColor=#37495A;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="580.47265625" y="225.5" width="179.0546875" height="39" as="geometry" />
+        </mxCell>
+        <mxCell id="edge1" value="" edge="1" parent="1" source="web" target="api" style="edgeStyle=none;rounded=0;html=0;endArrow=block;endFill=1;strokeColor=#536779;strokeWidth=2;fontSize=27;fontFamily=Arial;labelBackgroundColor=#FFFFFF;exitX=0.4939759036144578;exitY=1.0;entryX=0.4939759036144578;entryY=0.0;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_label1" value="HTTPS / JSON&#10;Опрос раз в 3 с" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontSize=27;fontColor=#37495A;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="394.1328125" y="544.0" width="231.734375" height="72" as="geometry" />
+        </mxCell>
+        <mxCell id="edge2" value="" edge="1" parent="1" source="api" target="db" style="edgeStyle=none;rounded=0;html=0;endArrow=block;endFill=1;strokeColor=#536779;strokeWidth=2;fontSize=27;fontFamily=Arial;labelBackgroundColor=#FFFFFF;exitX=1.0;exitY=0.5;entryX=0.0;entryY=0.46808510638297873;">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="edge_label2" value="SQL / TCP" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontSize=27;fontColor=#37495A;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="578.12890625" y="750.5" width="143.7421875" height="39" as="geometry" />
+        </mxCell>
+        <mxCell id="edge3" value="" edge="1" parent="1" source="api" target="sms1" style="edgeStyle=none;rounded=0;html=0;endArrow=block;endFill=1;strokeColor=#536779;strokeWidth=2;fontSize=27;fontFamily=Arial;labelBackgroundColor=#FFFFFF;exitX=1.0;exitY=0.10714285714285714;entryX=0.0;entryY=0.4883720930232558;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="635" y="700" />
+              <mxPoint x="635" y="600" />
+              <mxPoint x="1120" y="600" />
+              <mxPoint x="1120" y="425" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_label3" value="HTTPS / SMS API" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontSize=27;fontColor=#37495A;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="797.3125" y="545.5" width="235.375" height="39" as="geometry" />
+        </mxCell>
+        <mxCell id="edge4" value="" edge="1" parent="1" source="api" target="sms2" style="edgeStyle=none;rounded=0;html=0;endArrow=block;endFill=1;strokeColor=#536779;strokeWidth=2;fontSize=27;fontFamily=Arial;labelBackgroundColor=#FFFFFF;exitX=1.0;exitY=0.7857142857142857;entryX=0.0;entryY=0.4883720930232558;">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="630" y="890" />
+              <mxPoint x="630" y="977" />
+              <mxPoint x="1120" y="977" />
+              <mxPoint x="1120" y="835" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="edge_label4" value="HTTPS / SMS API" style="text;html=0;whiteSpace=wrap;align=center;verticalAlign=middle;fillColor=#FFFFFF;strokeColor=none;fontSize=27;fontColor=#37495A;fontFamily=Arial;" vertex="1" parent="1">
+          <mxGeometry x="782.3125" y="940.5" width="235.375" height="39" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
